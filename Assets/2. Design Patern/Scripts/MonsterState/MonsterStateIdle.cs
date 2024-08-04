@@ -2,13 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace MyProject
+namespace MyProject.State
 {
 	public class MonsterStateIdle : MonsterBaseState
 	{
-        public override void Enter()
+        public override void Enter(IHitable hitable)
         {
-            base.Enter();
+            anim.SetTrigger("Idle");
         }
 
         public override void Exit()
@@ -20,5 +20,6 @@ namespace MyProject
         {
             base.Update();
         }
+
     }
 }

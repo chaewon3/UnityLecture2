@@ -14,12 +14,11 @@ namespace MyProject.State
 
         public override void Exit()
         {
-            Debug.Log("대기상태 종료");
         }
 
         public override void Update()
         {
-            player.text.text = $"{GetType().Name} : {player.moveDistance:n1}";
+            player.text.text = $"HP : {player.currentHP}";
             player.moveDistance += Time.deltaTime;
         }
     }

@@ -1,69 +1,103 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using MyProject.State;
 
 namespace MyProject
 {
     public class Monster : MonoBehaviour
     {
-        public Renderer[] bodyrenderers;
-        public Renderer[] eyeRenderers;
+        public float damage = 3;
 
-        public Color bodyDayColor;
-        public Color eyeDayColor;
+        public Collider trigger;
+        private Rigidbody rig;
+        private CharacterController target;
 
-        public Color bodyNightColor;
-        public Color eyeNightColor;
+        private Vector3 position;
+        private MonsterStateMachine statemachine;
 
+        private void Awake()
+        {
+            rig = GetComponent<Rigidbody>();
+            statemachine = GetComponent<MonsterStateMachine>();
+            position = transform.position;
+        }
         private void Start()
         {
-            //GameManager.instance.OnMonsterSpawn(this);
-            GameManager.instance.onDayNightChange += OnDatNightChange;
-            OnDatNightChange(GameManager.instance.isDay);
+            GameManager.instance.GameOver += gameover;
         }
 
-        public void OnDestroy()
+        private void OnDestroy()
         {
-            //GameManager.instance.OnMonsterSpawn(this);
-            GameManager.instance.onDayNightChange -= OnDatNightChange;
+            GameManager.instance.GameOver -= gameover;
         }
 
-        public void OnDatNightChange(bool isDay)
+        private void Update()
         {
-            if(isDay)
+            if (target == null)
+                return;
+
+            Vector3 lookRotate = target.transform.position;
+            lookRotate.y = rig.transform.position.y;
+
+            rig.transform.LookAt(lookRotate);
+                       
+
+            Vector3 direction = target.transform.position - rig.transform.position;
+            if (direction.magnitude <= 2)
             {
-                DayColor();
+                statemachine.Transition(statemachine.attackState);
             }
             else
             {
-                NightColor();
+                statemachine.Transition(statemachine.chaseState);
+                rig.transform.position += rig.transform.forward * 2f * Time.deltaTime;
             }
         }
 
-        //퍼사드 패턴
-        public void DayColor()
+        private void OnTriggerEnter(Collider other)
         {
-            foreach(Renderer r in bodyrenderers)
+            if (other.gameObject.layer == LayerMask.NameToLayer("Player"))
             {
-                r.material.color = bodyDayColor;
+                StopAllCoroutines();
+                target = other.GetComponent<CharacterController>();
+                statemachine.hitable = other.GetComponent<IHitable>();
             }
-            foreach (Renderer r in eyeRenderers)
+        }
+
+        private void OnTriggerExit(Collider other)
+        {
+            if (other.gameObject.layer == LayerMask.NameToLayer("Player"))
             {
-                r.material.color = eyeDayColor;
+                statemachine.Transition(statemachine.idleState);
+                target = null;
+                StartCoroutine(GotoStartPosition());
             }
+        }
+
+        IEnumerator GotoStartPosition()
+        {
+            Vector3 lookRotate = position;
+
+            Vector3 direction;
+            do
+            {
+                lookRotate.y = rig.transform.position.y;
+
+                rig.transform.LookAt(lookRotate);
+
+                direction = position - rig.transform.position;
+                rig.transform.position += rig.transform.forward * 2f * Time.deltaTime;
+                yield return null;
+            } while (direction.magnitude > 0.3f);
 
         }
 
-        public void NightColor()
+        public void gameover(bool isdead)
         {
-            foreach (Renderer r in bodyrenderers)
-            {
-                r.material.color = bodyNightColor;
-            }
-            foreach (Renderer r in eyeRenderers)
-            {
-                r.material.color = eyeNightColor;
-            }
+            //이부분이 왜 안되는지 모르겠어요
+            trigger.enabled = false;
+            statemachine.Transition(statemachine.idleState);
         }
     }
 }

@@ -11,8 +11,11 @@ namespace MyProject.State
         public MonsterStateChase chaseState;
         public MonsterStateAttack attackState;
         public Monster monster;
-
         public MonsterBaseState currentState;
+
+        [HideInInspector]
+        public IHitable hitable;
+
 
         private void Start()
         {
@@ -25,7 +28,7 @@ namespace MyProject.State
 
             //시작 할 때 idle state
             currentState = idleState;
-            idleState.Enter();
+            idleState.Enter(hitable);
         }
 
         public void Transition(MonsterBaseState state)
@@ -35,7 +38,7 @@ namespace MyProject.State
             currentState.Exit();
             currentState = state;
 
-            currentState.Enter();
+            currentState.Enter(hitable);
         }
 
         private void Update()

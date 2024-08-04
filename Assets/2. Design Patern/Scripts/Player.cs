@@ -9,7 +9,7 @@ namespace MyProject
 {
 
     //상태 패턴 구현을 위해, 현재 움직이는 중인지 아니면 멈춰있는지 판단하고 싶음.
-    public class Player : MonoBehaviour
+    public class Player : MonoBehaviour, IHitable
     {
         public enum State
         {
@@ -19,6 +19,7 @@ namespace MyProject
             //attack = 3
         }
 
+        public float currentHP = 100;
         private CharacterController cc;
         public float moveSpeed = 5;
         public TextMeshPro text;
@@ -30,6 +31,8 @@ namespace MyProject
         public Transform shotPoint;
         private SkillContext skillcontext;
         private StateMachine stateMachine;
+
+        bool isdead;
 
         private void Awake()
         {
@@ -52,6 +55,8 @@ namespace MyProject
 
         private void Update()
         {
+            if (isdead == true)
+                return;
             Move();
             //StateUpdate();
             if(Input.GetButtonDown("Fire1"))
@@ -71,6 +76,11 @@ namespace MyProject
                 skillcontext.SetCurrentSkill(2);
             }
 
+            if (currentHP <= 0)
+            {
+                isdead = true;
+                GameManager.instance.PlayerDeadth();
+            }
         }
 
         public void Move()
@@ -138,15 +148,21 @@ namespace MyProject
             {
                 case State.Idle:
                     // 현재 상태가 Idle일 때 할 것
-                    text.text = $"{State.Idle} state : {stateStay: 0}";
+                    text.text = $"{State.Idle} state 남은 체력 : {currentHP}";
                     break;
                 case State.Move:
                     // 현재 상태가 Move일 떄 할 것
-                    text.text = $"{State.Move} state : {stateStay.ToString("0")}";
+                    text.text = $"{State.Move} state 남은 체력 : {currentHP}";
                     break;
             }
 
             stateStay += Time.deltaTime;
+        }
+
+        public void Hit(float damage)
+        {
+            currentHP -= damage;
+            print($"공격받고있음 남은 체력 : {currentHP}");
         }
     }
 }

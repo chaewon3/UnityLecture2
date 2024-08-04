@@ -2,13 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace MyProject
+namespace MyProject.State
 {
 	public class MonsterStateAttack : MonsterBaseState
 	{
-        public override void Enter()
+        IHitable hitable;
+        float timer = 0;
+        public override void Enter(IHitable hitable)
         {
-            base.Enter();
+            anim.SetTrigger("Attack");
+            this.hitable = hitable;
         }
 
         public override void Exit()
@@ -18,7 +21,13 @@ namespace MyProject
 
         public override void Update()
         {
-            base.Update();
+            timer += Time.deltaTime;
+            if (timer >= 2f)
+            {
+                hitable.Hit(monster.damage);
+                timer = 0;
+            }
         }
+
     }
 }

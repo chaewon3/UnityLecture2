@@ -21,11 +21,13 @@ public class GameManager : MonoBehaviour
     // 해당 이벤트 호출이 필요한 객체들이 "나도 상태 변하면 알려주세요." 라고 등록해놓는 형태의
     // 디자인 패턴
 
-    private List<Monster> monsters = new(); //  구독자들
+    private List<MonsterColor> monsterColors = new(); //  구독자들
+    private List<Monster> monsters = new();
 
     //C#의 event는 옵저버 패턴 구현에 최적화된 구조로 만들어져 있으므로 
     // event를 활용하는 것만으로도 옵저버 패턴을 적용했다고 볼 수 있음.
     public event Action<bool> onDayNightChange;
+    public event Action<bool> GameOver;
 
     private void Awake()
     {
@@ -57,14 +59,21 @@ public class GameManager : MonoBehaviour
         onDayNightChange?.Invoke(isDay);
     }
 
+    public void PlayerDeadth()
+    {
+        GameOver?.Invoke(true);
+    }
+
     public void OnMonsterSpawn(Monster monster)
     {
+        //monsterColors.Add(monster);
         monsters.Add(monster);
-        monster.OnDatNightChange(isDay);
+        //monster.OnDatNightChange(isDay);
     }
 
     public void OnMonsyterDespawn(Monster monster)
     {
         monsters.Remove(monster);
+        //monsterColors.Remove(monster);
     }
 }

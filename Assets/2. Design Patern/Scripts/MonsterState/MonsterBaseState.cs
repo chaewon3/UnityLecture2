@@ -2,14 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace MyProject
+namespace MyProject.State
 {
     public class MonsterBaseState
     {
         public Monster monster;
-        public virtual void Enter()
+        public Animator anim;
+        public virtual void Enter(IHitable hitable)
         {
-
         }
 
         public virtual void Exit()
@@ -19,6 +19,7 @@ namespace MyProject
         public void Initialize(Monster monster)
         {
             this.monster = monster;
+            anim = monster.GetComponent<Animator>();
         }
 
         public virtual void Update()

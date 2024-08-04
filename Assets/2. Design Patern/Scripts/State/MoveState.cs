@@ -13,12 +13,11 @@ namespace MyProject.State
 
         public override void Exit()
         {
-            Debug.Log("이동상태 종료");
         }
 
         public override void Update()
         {
-            player.text.text = $"{GetType().Name} : {player.stateStay:n0}";
+            player.text.text = $"HP : {player.currentHP}";
         }
 
     }

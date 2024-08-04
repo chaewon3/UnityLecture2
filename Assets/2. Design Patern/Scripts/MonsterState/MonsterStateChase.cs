@@ -2,13 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace MyProject
+namespace MyProject.State
 {
 	public class MonsterStateChase : MonsterBaseState
 	{
-        public override void Enter()
+        public override void Enter(IHitable hitable)
         {
-            base.Enter();
+            anim.SetTrigger("Chase");
         }
 
         public override void Exit()
