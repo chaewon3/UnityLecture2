@@ -44,21 +44,6 @@ namespace MyProject
 		// 로그인이 완료 되었을 때 호출될 함수를 파라미터로 함께 받아주도록 함.
 		public void Login(string email, string passwd, Action<UserData> successCallback, Action failureCallback)
         {
-			string pwhash = "";
-			SHA256 sha256 = SHA256.Create();
-			byte[] hashArray = sha256.ComputeHash(Encoding.UTF8.GetBytes(passwd));
-
-			foreach(byte b in hashArray)
-            {
-				pwhash += $"{b:X2}";
-				//pwhash += b.ToString("X2"); 같은 방법
-			}
-			sha256.Dispose();
-
-			print(pwhash);
-			
-			
-
 			MySqlCommand cmd = new MySqlCommand();
 			cmd.Connection = conn;
 			cmd.CommandText = $"SELECT*FROM {tableName} WHERE email='{email}' AND pw='{passwd}'";
@@ -120,6 +105,40 @@ namespace MyProject
             }
 		}
 
+		public void ChangeInfo(UserData data,string name, string profile, Action successCallback, Action failureCallback)
+        {
+			int uid = data.UID;
+
+			MySqlCommand cmd = new MySqlCommand();
+			cmd.Connection = conn;
+			cmd.CommandText = $"UPDATE {tableName} SET name = '{name}', profile_text = '{profile}' WHERE uid = '{uid}' ";
+
+			int queryCount = cmd.ExecuteNonQuery();
+
+			if(queryCount >0)
+            {
+				data.name = name;
+				data.profileText = profile;
+				successCallback?.Invoke();
+			}
+			else
+				failureCallback?.Invoke();
+        }
+
+		public void Resgin(int uid, Action successCallback, Action failureCallback)
+        {
+			MySqlCommand cmd = new MySqlCommand();
+			cmd.Connection = conn;
+			cmd.CommandText = $"DELETE FROM {tableName} WHERE uid = '{uid}'";
+
+			int queryCount = cmd.ExecuteNonQuery();
+
+			if (queryCount > 0)
+				successCallback?.Invoke();
+			else
+				failureCallback?.Invoke();
+		}
+
 		//나중에 만들떄는 실패한 함수도 같이 만들어야 함 
 		public void LevelUP(UserData data, Action successCallback)
         {
@@ -144,5 +163,30 @@ namespace MyProject
             }
         }
 
+		public void Search(string name, Action<UserData> successCallback, Action failureCallback)
+        {
+			MySqlCommand cmd = new MySqlCommand();
+			cmd.Connection = conn;
+			cmd.CommandText = $"SELECT*FROM {tableName} WHERE name='{name}'";
+
+			MySqlDataAdapter dataAdapter = new MySqlDataAdapter(cmd);
+			DataSet set = new DataSet();
+
+			dataAdapter.Fill(set);
+
+			bool isSignUpSuccess = set.Tables.Count > 0 && set.Tables[0].Rows.Count > 0;
+
+			if(isSignUpSuccess)
+            {
+				DataRow row = set.Tables[0].Rows[0];
+				UserData data = new UserData(row);
+
+				successCallback?.Invoke(data);
+			}
+			else
+            {
+				failureCallback?.Invoke();
+			}
+		}
 	}
 }
