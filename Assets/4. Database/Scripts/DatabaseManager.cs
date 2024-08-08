@@ -11,7 +11,7 @@ namespace MyProject
 {
 	public class DatabaseManager : MonoBehaviour
 	{
-		private string severIP = "127.0.0.1";
+		private string severIP = "13.125.2.229";
 		private string dbName = "game";
 		private string tableName = "users";
 		private string rootPassward = "0619"; // 테스트 시에 활용할 수 있지만 보안에 취약하므로 주의
