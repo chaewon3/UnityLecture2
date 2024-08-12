@@ -247,6 +247,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ImagePrefabs: {fileID: 616314090963501337, guid: 488272f10b7f7254bb61a9fb3cdeb12e, type: 3}
   canvasTransform: {fileID: 1597669500}
+  defaultAvatar: {fileID: 21300000, guid: cee1f68595568a54984bd7eb3b8e16c4, type: 3}
 --- !u!4 &570372338
 Transform:
   m_ObjectHideFlags: 0
