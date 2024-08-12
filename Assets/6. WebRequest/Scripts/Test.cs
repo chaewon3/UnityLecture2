@@ -23,7 +23,7 @@ namespace MyProject
             for (int i = 0; i < babbling.Length; i++)
             {
                 int cut = 0;
-                while (true)
+                while (cut <babbling[i].Length)
                 {
                     print("1");
                     bool isbabbling = false;
